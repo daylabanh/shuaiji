@@ -1548,6 +1548,742 @@ body.printing #printRoot{display:block!important;max-width:860px;margin:0 auto;p
 
 
 </style>
+<style>
+/* ============================================================
+   ios.css — iOS 26 · Liquid Glass 皮肤（覆盖层，最后加载）
+   只改外观与动效，不动任何 id / 数据结构
+   ============================================================ */
+
+/* ---------- 1. 基础变量 ---------- */
+:root{
+  --paper:#f2f2f7;                 /* systemGroupedBackground */
+  --surface:#ffffff;
+  --surface-2:#f7f7fa;
+  --ink:#1c1c1e;                  /* label */
+  --ink-2:#3c3c43;                /* secondaryLabel */
+  --ink-3:#8a8a8e;                /* tertiaryLabel */
+  --line:rgba(60,60,67,.16);      /* separator */
+  --line-2:rgba(60,60,67,.09);
+
+  --brand:#1b9c77;                /* 保留「帅记」薄荷绿做 accent */
+  --brand-2:#178a69;
+  --gold:#178a69;
+  --gold-soft:#b9e8d8;
+  --ok:#34c759;
+  --bad:#ff3b30;
+
+  --tint:#1b9c77;
+  --tint-2:#12b98d;
+  --tint-ink:rgba(27,156,119,.12);
+  --tint-line:rgba(27,156,119,.30);
+
+  --radius:22px;                  /* 连续圆角，接近 iOS 卡片 */
+  --radius-sm:14px;
+  --shadow-sm:0 1px 1px rgba(16,20,40,.04),0 8px 24px rgba(20,28,45,.06);
+  --shadow:0 2px 10px rgba(16,20,40,.06),0 26px 64px rgba(16,20,40,.14);
+
+  --sans:-apple-system,"SF Pro Text","SF Pro Display","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI",system-ui,"Helvetica Neue",sans-serif;
+  --serif:"Songti SC","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+
+  --glass:rgba(255,255,255,.66);
+  --glass-strong:rgba(255,255,255,.80);
+  --glass-line:rgba(255,255,255,.72);
+  --hairline:rgba(60,60,67,.14);
+
+  --spring:cubic-bezier(.22,1,.32,1);      /* 近似 iOS spring */
+  --spring-soft:cubic-bezier(.34,.96,.44,1);
+  --side-w:266px;
+}
+
+/* ---------- 2. 画布：柔和壁纸 + 轻漂移 ---------- */
+html,body{height:100%}
+body{
+  font-family:var(--sans)!important;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  background:var(--paper)!important;
+  background-image:
+    radial-gradient(720px 620px at 88% -6%, rgba(196,236,222,.85), transparent 62%),
+    radial-gradient(620px 560px at -4% 104%, rgba(255,224,220,.72), transparent 64%),
+    radial-gradient(880px 700px at 54% 8%, rgba(226,222,252,.62), transparent 66%),
+    linear-gradient(180deg,#f7f7fb 0%,#f2f2f7 46%,#eeeff4 100%)!important;
+  background-attachment:fixed!important;
+}
+body::before{
+  content:"";position:fixed;inset:-14%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(520px 460px at 22% 30%, rgba(186,232,214,.36), transparent 60%),
+    radial-gradient(460px 420px at 76% 72%, rgba(255,214,214,.28), transparent 62%);
+  animation:wallDrift 34s ease-in-out infinite alternate;
+}
+@keyframes wallDrift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-1.6%,1.2%,0) scale(1.04)}}
+
+::selection{background:rgba(27,156,119,.22)}
+:focus-visible{outline:3px solid rgba(27,156,119,.45);outline-offset:2px;border-radius:10px}
+
+/* ---------- 3. 布局骨架 ---------- */
+.app{display:flex;gap:0;min-height:100vh}
+
+/* 侧栏 → 悬浮玻璃面板（iPadOS 26 侧栏观感） */
+.side{
+  width:var(--side-w)!important;flex:0 0 var(--side-w)!important;
+  position:sticky!important;top:12px!important;
+  height:calc(100vh - 24px)!important;
+  margin:12px 6px 12px 12px;
+  border-radius:26px!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.68))!important;
+  -webkit-backdrop-filter:blur(28px) saturate(180%);
+  backdrop-filter:blur(28px) saturate(180%);
+  border:1px solid rgba(255,255,255,.8)!important;
+  box-shadow:
+    0 1px 1px rgba(16,20,40,.04),
+    0 18px 44px rgba(18,26,44,.10),
+    inset 0 1px 0 rgba(255,255,255,.9)!important;
+  color:var(--ink)!important;
+  padding:16px 0 12px!important;
+  overflow:hidden auto;
+}
+.side::-webkit-scrollbar{width:0}
+.side{scrollbar-width:none}
+
+/* 品牌区 */
+.brand{padding:0 16px 14px!important;border-bottom:1px solid var(--line-2)!important;margin-bottom:4px}
+.brand .mark{
+  width:38px!important;height:38px!important;border-radius:11px!important;margin-bottom:10px!important;
+  background:linear-gradient(150deg,#d9f5ea,#b8e8d8)!important;
+  border:1px solid rgba(27,156,119,.18)!important;
+  box-shadow:0 6px 16px rgba(27,156,119,.14),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+.brand h1{
+  font-family:var(--sans)!important;font-size:22px!important;font-weight:700!important;
+  letter-spacing:.02em!important;color:var(--ink)!important;
+}
+
+/* 总进度：iOS 卡片 */
+.overview{
+  margin:12px 12px 6px;padding:12px 14px 10px!important;
+  background:rgba(255,255,255,.7);
+  border:1px solid rgba(255,255,255,.8);border-radius:16px;
+  box-shadow:0 1px 1px rgba(16,20,40,.03),0 6px 18px rgba(18,26,44,.05);
+}
+.overview .ovrow{font-size:12px!important;color:var(--ink-3)!important;margin-bottom:7px!important}
+.overview .ovrow b{color:var(--ink)!important;font-weight:600!important;font-variant-numeric:tabular-nums}
+.track{height:7px!important;border-radius:99px!important;background:rgba(120,120,128,.14)!important}
+.track > i{background:linear-gradient(90deg,#7fe0c0,var(--tint))!important;transition:width .55s var(--spring)}
+
+/* 导航：iOS 列表行 */
+.nav{padding:8px 8px 0!important}
+.nav .sec,.secbtn{
+  color:var(--ink-3)!important;font-size:11px!important;letter-spacing:.12em!important;
+  text-transform:uppercase;border-top:1px solid var(--line-2)!important;
+  margin:14px 6px 4px!important;padding:10px 6px 6px!important;font-weight:600!important;
+}
+.secbtn .chev{color:var(--ink-3)!important}
+.nav button{
+  border-radius:12px!important;font-size:13.5px!important;padding:9px 10px!important;
+  color:var(--ink-2)!important;transition:background .2s var(--spring-soft),color .2s,transform .22s var(--spring)!important;
+}
+.nav button svg{opacity:.62!important;color:inherit!important}
+.nav button:hover{background:rgba(120,120,128,.09)!important;color:var(--ink)!important}
+.nav button:active{transform:scale(.975)}
+.nav button.on{
+  background:linear-gradient(180deg,rgba(27,156,119,.20),rgba(27,156,119,.13))!important;
+  border:1px solid rgba(27,156,119,.20);
+  color:#0b5d47!important;font-weight:600!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6)!important;
+}
+.nav button.on svg{opacity:1!important;color:#12a37b!important}
+.nav .plist button{border-radius:10px!important;font-size:12.5px!important;padding:8px 10px!important}
+.nav .plist button .dot{background:rgba(120,120,128,.35)!important}
+.nav .plist button.on .dot{background:#fff!important}
+.nav .plist button.fin .dot{background:#34c759!important}
+.nav .badge{
+  background:rgba(120,120,128,.12)!important;color:var(--ink-3)!important;
+  border-radius:8px!important;font-variant-numeric:tabular-nums;font-size:11px!important;
+}
+.nav .plist button.on .badge{background:rgba(255,255,255,.7)!important;color:#0b5d47!important}
+
+/* 侧栏底部按钮：玻璃小胶囊 */
+.sidefoot{
+  border-top:1px solid var(--line-2)!important;color:var(--ink-3)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.9) 42%)!important;
+  padding:12px 14px 14px!important;
+}
+.sidefoot .savelight{color:var(--ink-3)!important;font-size:11.5px!important}
+.sidefoot .savelight i{background:#34c759!important;box-shadow:0 0 0 3px rgba(52,199,89,.16)!important}
+.sidefoot button{
+  border:1px solid var(--hairline)!important;background:rgba(255,255,255,.72)!important;
+  color:var(--ink-2)!important;border-radius:999px!important;padding:6px 11px!important;
+  transition:transform .22s var(--spring),background .2s,box-shadow .2s!important;
+}
+.sidefoot button:hover{background:#fff!important;color:var(--ink)!important;box-shadow:0 4px 12px rgba(18,26,44,.08)}
+.sidefoot button:active{transform:scale(.96)}
+.sidefoot button#btnAcct.on{background:var(--tint)!important;border-color:transparent!important;color:#fff!important}
+
+/* ---------- 4. 主区与页面标题 ---------- */
+.main{flex:1;min-width:0}
+.wrap{max-width:940px!important;padding:44px 40px 120px!important}
+.pagehead{margin:0 0 26px!important}
+.eyebrow{
+  font-size:11px!important;letter-spacing:.14em!important;color:var(--tint)!important;
+  font-weight:600!important;margin-bottom:10px!important;text-transform:uppercase;
+}
+h2.page,h1.page{
+  font-family:var(--sans)!important;font-size:36px!important;font-weight:700!important;
+  letter-spacing:-.024em!important;line-height:1.12!important;margin:0 0 10px!important;color:var(--ink)!important;
+}
+.sub{color:var(--ink-3)!important;font-size:13.5px!important;line-height:1.7!important;max-width:66ch!important}
+.paperhead .ptitle{
+  font-family:var(--sans)!important;font-size:30px!important;font-weight:700!important;letter-spacing:-.02em!important;
+}
+.paperhead .pmeta{font-size:12.5px!important;color:var(--ink-3)!important;gap:12px!important}
+.paperhead .pmeta svg{color:var(--tint)!important}
+
+/* ---------- 5. 卡片：Liquid Glass ---------- */
+.card,.kpi,.chartcard,.wcard,.vitem,.lexbig,.lexcard,.game,.trow,.nbnote .nb-nbox,.step,.libcard,.stp,.an-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.80))!important;
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  backdrop-filter:blur(22px) saturate(180%);
+  border:1px solid rgba(255,255,255,.78)!important;
+  box-shadow:
+    0 1px 1px rgba(16,20,40,.03),
+    0 10px 28px rgba(18,26,44,.07),
+    inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+.card{border-radius:var(--radius)!important;padding:20px 22px!important;margin-bottom:16px!important}
+.card h3{font-size:15px!important;font-weight:600!important;letter-spacing:-.005em;color:var(--ink)!important}
+.card h3 svg{color:var(--tint)!important}
+.card p{font-size:13.5px!important;color:var(--ink-2)!important;line-height:1.8!important}
+.card.tint{background:linear-gradient(180deg,rgba(247,247,250,.95),rgba(242,242,247,.86))!important}
+.card.dark{
+  background:linear-gradient(160deg,#0f2a22,#0a1d18)!important;border-color:rgba(255,255,255,.1)!important;
+  color:#eef5f1!important;
+}
+.card.dark p{color:#b9cdc5!important}
+.card.dark h3{color:#fff!important}
+.card.dark h3 svg{color:#8fe8c8!important}
+
+/* 统计卡：iOS「小方块」 */
+.kpis{gap:12px!important}
+.kpi{border-radius:20px!important;padding:15px 16px!important}
+.kpi .ic{color:var(--tint)!important;opacity:.55}
+.kpi b{
+  font-family:var(--sans)!important;font-size:27px!important;font-weight:700!important;
+  letter-spacing:-.03em!important;font-variant-numeric:tabular-nums;
+}
+.kpi span{font-size:12px!important;color:var(--ink-3)!important;letter-spacing:.01em}
+
+hr.soft{border-top:1px solid var(--line-2)!important}
+
+/* ---------- 6. 按钮 / 输入 / 分段控件 ---------- */
+.btn{
+  border-radius:999px!important;border:1px solid var(--hairline)!important;
+  background:rgba(255,255,255,.78)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(180%);
+  backdrop-filter:blur(14px) saturate(180%);
+  color:var(--ink-2)!important;font-size:13px!important;font-weight:500!important;
+  padding:8px 14px!important;gap:6px!important;
+  transition:transform .24s var(--spring),background .2s,border-color .2s,box-shadow .2s,color .2s!important;
+}
+.btn svg{opacity:.7}
+.btn:hover{background:#fff!important;border-color:var(--tint-line)!important;color:var(--ink)!important;
+  box-shadow:0 6px 18px rgba(18,26,44,.08)!important;transform:translateY(-1px)}
+.btn:active{transform:scale(.955)!important}
+.btn.on,.btn.primary{
+  background:linear-gradient(180deg,var(--tint-2),var(--tint))!important;
+  border-color:transparent!important;color:#fff!important;
+  box-shadow:0 8px 22px rgba(27,156,119,.30),inset 0 1px 0 rgba(255,255,255,.3)!important;
+}
+.btn.on:hover,.btn.primary:hover{color:#fff!important;background:linear-gradient(180deg,#16c497,var(--tint))!important}
+.btn.sm{padding:5px 11px!important;font-size:12px!important}
+.btn.ghost{background:rgba(255,255,255,.4)!important}
+.btn.danger:hover{border-color:rgba(255,59,48,.35)!important;color:var(--bad)!important;background:#fff6f5!important}
+
+.chip{
+  border-radius:999px!important;background:rgba(120,120,128,.10)!important;
+  border:1px solid transparent!important;color:var(--ink-2)!important;font-size:12px!important;
+  padding:5px 11px!important;
+}
+.chip svg{color:var(--tint)!important}
+
+/* 搜索框：iOS search field */
+.searchbar{
+  border-radius:12px!important;background:rgba(120,120,128,.10)!important;
+  border:1px solid transparent!important;box-shadow:none!important;padding:4px 12px!important;
+}
+.searchbar:focus-within{background:rgba(120,120,128,.14)!important;box-shadow:0 0 0 3px rgba(27,156,119,.14)!important}
+.searchbar input{font-size:14px!important;background:none!important}
+.searchbar svg{color:var(--ink-3)!important}
+
+/* 输入类控件统一 */
+input[type=text],input[type=email],input[type=password],input[type=search],textarea,select,.trsel,.ginput,.ttaa,.an-note,.qn-ta,.nb-nta{
+  border-radius:12px!important;background:rgba(255,255,255,.86)!important;
+  border:1px solid var(--hairline)!important;color:var(--ink)!important;
+  transition:box-shadow .2s,border-color .2s,background .2s!important;
+}
+input:focus,textarea:focus,select:focus{
+  outline:none!important;border-color:var(--tint-line)!important;
+  box-shadow:0 0 0 3.5px rgba(27,156,119,.16)!important;background:#fff!important;
+}
+
+/* 分段控件（词库页 / 登录页 tabs） */
+.lextabs,.lgtabs{
+  background:rgba(120,120,128,.12)!important;border:0!important;border-radius:11px!important;
+  padding:3px!important;gap:2px!important;
+}
+.ltab,.lgtabs button{
+  border-radius:9px!important;font-size:13px!important;color:var(--ink-2)!important;padding:7px 13px!important;
+  transition:background .22s var(--spring-soft),color .2s,box-shadow .2s!important;
+}
+.ltab.on,.lgtabs button.on{
+  background:#fff!important;color:var(--ink)!important;font-weight:600!important;
+  box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.04)!important;
+}
+.ltab.on b{color:var(--tint)!important}
+.lgtabs button.on:after{display:none!important}
+
+/* ---------- 7. 卷面 / 阅读 ---------- */
+.toolbar{
+  border-radius:16px!important;border:1px solid rgba(255,255,255,.7)!important;
+  background:rgba(242,242,247,.72)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  backdrop-filter:blur(24px) saturate(180%);
+  box-shadow:0 8px 24px rgba(18,26,44,.07)!important;
+  padding:8px 10px!important;margin:6px 0 26px!important;top:12px!important;
+  border-bottom:1px solid rgba(255,255,255,.7)!important;
+}
+.toolbar .btn{padding:7px 12px!important;font-size:12.5px!important}
+.scorebox,.timerbox{
+  border-radius:12px!important;background:rgba(255,255,255,.78)!important;
+  border:1px solid rgba(255,255,255,.8)!important;box-shadow:0 4px 14px rgba(18,26,44,.06)!important;
+}
+.timerbox .tval{font-family:var(--sans)!important;font-variant-numeric:tabular-nums;font-weight:600!important}
+.minitrack{background:rgba(120,120,128,.16)!important}
+.minitrack i{background:var(--tint)!important}
+
+.secmark{margin:46px 0 18px!important}
+.secmark .num{
+  width:32px!important;height:32px!important;border-radius:10px!important;flex-basis:32px!important;
+  background:linear-gradient(180deg,var(--tint-2),var(--tint))!important;color:#fff!important;
+  font-family:var(--sans)!important;font-weight:600!important;
+  box-shadow:0 6px 16px rgba(27,156,119,.24)!important;
+}
+.secmark h3{font-family:var(--sans)!important;font-size:18px!important;font-weight:650!important;letter-spacing:-.01em!important}
+.textlabel{color:var(--tint)!important;font-size:11px!important;letter-spacing:.14em!important;margin:32px 0 12px!important}
+.textlabel::after{background:var(--line-2)!important}
+
+.para{
+  font-family:var(--serif)!important;font-size:var(--reading)!important;line-height:1.95!important;
+  color:#1b201d!important;text-align:justify;
+}
+.para mark{border-radius:5px!important;box-decoration-break:clone;-webkit-box-decoration-break:clone;
+  padding:.5px 2px!important}
+.para mark.y{background:rgba(255,214,80,.42)!important}
+.para mark.g{background:rgba(52,199,89,.26)!important}
+.para mark.b{background:rgba(10,132,255,.18)!important}
+.para mark.p{background:rgba(255,55,95,.18)!important}
+.qnote{
+  border-radius:12px!important;background:rgba(255,255,255,.7)!important;
+  border:1px solid rgba(255,255,255,.7)!important;border-left:3px solid var(--tint)!important;
+  font-family:var(--sans)!important;box-shadow:0 6px 18px rgba(18,26,44,.05);
+}
+.qnote b{color:var(--tint)!important}
+
+/* 选项：iOS 复选行 */
+.opt{
+  border-radius:13px!important;border:1px solid var(--hairline)!important;
+  background:rgba(255,255,255,.78)!important;font-size:13.5px!important;
+  transition:transform .22s var(--spring),background .18s,border-color .18s,box-shadow .18s!important;
+}
+.opt:hover{background:#fff!important;border-color:rgba(27,156,119,.3)!important;box-shadow:0 6px 16px rgba(18,26,44,.07)}
+.opt:active{transform:scale(.985)}
+.opt b{
+  border-radius:7px!important;background:rgba(120,120,128,.14)!important;color:var(--ink-3)!important;
+  font-family:var(--sans)!important;font-size:11.5px!important;
+}
+.opt.sel{
+  border-color:var(--tint)!important;background:rgba(27,156,119,.10)!important;
+  box-shadow:0 0 0 1px var(--tint) inset!important;color:var(--ink)!important;
+}
+.opt.sel b{background:var(--tint)!important;color:#fff!important}
+.opt.right{border-color:rgba(52,199,89,.5)!important;background:rgba(52,199,89,.12)!important;color:#126b34!important}
+.opt.right b{background:#34c759!important;color:#fff!important}
+.opt.wrong{border-color:rgba(255,59,48,.42)!important;background:rgba(255,59,48,.10)!important;color:#a52218!important}
+.opt.wrong b{background:#ff3b30!important;color:#fff!important}
+.qno{
+  border-radius:9px!important;background:rgba(120,120,128,.12)!important;color:var(--ink-2)!important;
+  font-family:var(--sans)!important;font-weight:600!important;
+}
+.q{border-top:1px solid var(--line-2)!important}
+.stem{font-size:14px!important}
+.tag{border-radius:999px!important;font-size:10.5px!important;padding:3px 9px!important;font-weight:500!important}
+.partb .pbcol{border-radius:16px!important;background:rgba(255,255,255,.66)!important;border:1px solid rgba(255,255,255,.7)!important}
+.chartcard{border-radius:20px!important;padding:14px!important}
+.chartcard .chartimg{border-radius:14px!important}
+.stepper .stp{border-radius:12px!important}
+.stp.done{border-color:rgba(27,156,119,.35)!important;background:rgba(27,156,119,.10)!important}
+.stp b{background:rgba(120,120,128,.14)!important;color:var(--ink-3)!important}
+.stp.done b{background:var(--tint)!important;color:#fff!important}
+
+/* ---------- 8. 查词浮层：iOS 上下文菜单 ---------- */
+.pop,.wpop,.nbtip{
+  border-radius:20px!important;border:1px solid rgba(255,255,255,.8)!important;
+  background:rgba(255,255,255,.86)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(200%);
+  backdrop-filter:blur(30px) saturate(200%);
+  box-shadow:0 2px 8px rgba(16,20,40,.08),0 30px 70px rgba(16,20,40,.22)!important;
+  animation:popIn .34s var(--spring) both;
+}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(6px)}to{opacity:1;transform:none}}
+.pop .w,.wpop .wh .w{font-family:var(--sans)!important;font-weight:700!important;letter-spacing:-.02em!important}
+.pop .tr .pos{color:var(--tint)!important;font-style:italic}
+.wpop .say button{border-radius:999px!important;background:rgba(120,120,128,.10)!important;border:0!important}
+.wpop .sec .lb{color:var(--tint)!important}
+.wpop .exs{border-left:3px solid var(--gold-soft)!important;border-radius:0 10px 10px 0!important;background:rgba(246,248,247,.9)!important}
+.wpop .col{border-radius:10px!important;background:rgba(120,120,128,.08)!important;border:0!important;color:var(--ink-2)!important}
+.annbar{border-radius:18px!important;background:rgba(255,255,255,.86)!important;
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.8)!important;box-shadow:0 20px 50px rgba(16,20,40,.2)!important}
+.annbar .sw{border:0!important;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+
+/* ---------- 9. 生词本 / 复习 ---------- */
+.reviewrow{border-bottom:1px solid var(--line-2)!important;padding:12px 6px!important;gap:6px!important}
+.rvlabel{color:var(--ink-3)!important}
+.rvchip{
+  border-radius:999px!important;border:1px solid transparent!important;
+  background:rgba(120,120,128,.10)!important;color:var(--ink-2)!important;font-size:12.5px!important;
+  padding:6px 13px!important;transition:transform .22s var(--spring),background .2s,color .2s,box-shadow .2s!important;
+}
+.rvchip:hover{background:rgba(120,120,128,.16)!important}
+.rvchip:active{transform:scale(.96)}
+.rvchip.on{background:linear-gradient(180deg,var(--tint-2),var(--tint))!important;color:#fff!important;
+  box-shadow:0 6px 16px rgba(27,156,119,.28)!important}
+
+.vitem{border-radius:16px!important;padding:12px 16px!important;transition:transform .24s var(--spring),box-shadow .2s!important}
+.vitem:hover{transform:translateY(-1px);box-shadow:0 1px 1px rgba(16,20,40,.03),0 16px 36px rgba(18,26,44,.10)!important}
+.vitem .w{font-family:var(--sans)!important;font-size:16px!important;font-weight:650!important;letter-spacing:-.01em}
+
+/* 闪卡：玻璃卡 + 3D 质感 */
+.flashcard{
+  border-radius:26px!important;padding:26px 24px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.82))!important;
+  border:1px solid rgba(255,255,255,.85)!important;
+  box-shadow:0 2px 6px rgba(16,20,40,.05),0 30px 60px rgba(18,26,44,.12),inset 0 1px 0 #fff!important;
+  transition:transform .3s var(--spring),box-shadow .3s!important;
+}
+.flashcard:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(16,20,40,.06),0 36px 72px rgba(18,26,44,.16),inset 0 1px 0 #fff!important}
+.flashcard:active{transform:scale(.994)}
+.flashcard .fw{font-family:var(--sans)!important;font-size:36px!important;font-weight:700!important;letter-spacing:-.028em!important;color:var(--ink)!important}
+.fph{font-size:12.5px!important;color:var(--ink-3)!important;font-variant-numeric:tabular-nums}
+.fphoto{border-radius:18px!important;background:#f2f2f7!important;
+  box-shadow:0 10px 30px rgba(18,26,44,.10),inset 0 1px 0 rgba(255,255,255,.8)!important}
+.fart{border-radius:22px!important}
+.fback{border-top:1px solid var(--line-2)!important;transition:max-height .42s var(--spring),opacity .3s ease,margin .3s!important}
+.fcol span{border-radius:10px!important;background:rgba(120,120,128,.08)!important;border:0!important}
+.fex{border-radius:12px!important;border-left:3px solid var(--tint)!important;background:rgba(246,248,247,.92)!important}
+.fstats b{color:var(--tint)!important}
+
+/* 配对 / 听音 / 填空 */
+.mgrid{gap:11px!important}
+.mitem{
+  border-radius:14px!important;border:1px solid var(--hairline)!important;
+  background:rgba(255,255,255,.82)!important;font-size:13px!important;
+  transition:transform .22s var(--spring),background .18s,border-color .18s,color .18s!important;
+}
+.mitem:hover{background:#fff!important;border-color:var(--tint-line)!important}
+.mitem:active{transform:scale(.97)}
+.mitem.sel{background:linear-gradient(180deg,var(--tint-2),var(--tint))!important;border-color:transparent!important;color:#fff!important;
+  box-shadow:0 8px 18px rgba(27,156,119,.28)!important}
+.mitem.ok{border-color:rgba(52,199,89,.4)!important;background:rgba(52,199,89,.12)!important;color:#126b34!important}
+.mitem.bad{border-color:rgba(255,59,48,.42)!important;background:rgba(255,59,48,.10)!important;color:#a52218!important}
+.spkbig{
+  border-radius:999px!important;border:1px solid rgba(27,156,119,.28)!important;
+  background:radial-gradient(circle at 50% 30%,#ffffff,#dcf7ec 70%)!important;color:var(--tint)!important;
+  box-shadow:0 14px 34px rgba(27,156,119,.22),inset 0 1px 0 #fff!important;
+  transition:transform .26s var(--spring),box-shadow .25s!important;
+}
+.spkbig:active{transform:scale(.93)!important;box-shadow:0 6px 16px rgba(27,156,119,.22)!important}
+.gex{border-radius:16px!important;background:rgba(255,255,255,.8)!important;border:1px solid rgba(255,255,255,.8)!important;
+  font-family:var(--serif)!important;box-shadow:0 8px 24px rgba(18,26,44,.06)}
+.gezh{color:var(--ink-3)!important}
+.game{border-radius:24px!important}
+.game .gq{font-family:var(--sans)!important;font-weight:600!important;letter-spacing:-.02em}
+.game .gq.en{font-family:var(--sans)!important;font-size:30px!important;font-weight:700!important}
+.gopt{border-radius:14px!important;border:1px solid var(--hairline)!important;background:rgba(255,255,255,.85)!important;
+  transition:transform .22s var(--spring),background .18s,border-color .18s!important}
+.gopt:active{transform:scale(.98)}
+.gopt.right{border-color:rgba(52,199,89,.45)!important;background:rgba(52,199,89,.12)!important;color:#126b34!important}
+.gopt.bad{border-color:rgba(255,59,48,.42)!important;background:rgba(255,59,48,.09)!important;color:#a52218!important}
+.game .gin{border-radius:14px!important}
+
+/* ---------- 10. 错题本 / 资料库 / 仪表盘 ---------- */
+.wcard{border-radius:18px!important;padding:14px 16px!important}
+.wcard .wc-type{border-radius:999px!important;background:rgba(255,159,10,.14)!important;color:#8a5310!important}
+.wcard .wc-sent{border-radius:0 12px 12px 0!important;border-left:3px solid var(--tint)!important;background:rgba(246,248,247,.92)!important}
+.wc-opt{border-radius:8px!important}
+.wc-opt.r{background:rgba(52,199,89,.14)!important;border-color:rgba(52,199,89,.32)!important}
+.wc-opt.w{background:rgba(255,59,48,.10)!important;border-color:rgba(255,59,48,.28)!important}
+.wmini{border-radius:8px!important;background:rgba(255,255,255,.9)!important}
+
+.flow{gap:11px!important}
+.step{border-radius:18px!important;padding:15px!important;
+  transition:transform .26s var(--spring),box-shadow .25s!important}
+.step:hover{transform:translateY(-2px);box-shadow:0 2px 6px rgba(16,20,40,.05),0 20px 44px rgba(18,26,44,.11)!important}
+.step:active{transform:scale(.985)}
+.sn{color:var(--tint)!important;font-family:var(--sans)!important;font-weight:600!important}
+.st{font-family:var(--sans)!important;font-weight:650!important;letter-spacing:-.01em}
+.sbar{background:rgba(120,120,128,.14)!important;height:5px!important}
+.sbar i{background:linear-gradient(90deg,#7fe0c0,var(--tint))!important}
+.sgo{color:var(--tint)!important}
+.libgrid{gap:11px!important}
+.libcard{border-radius:18px!important;padding:15px!important;transition:transform .26s var(--spring),box-shadow .25s!important}
+.libcard:hover{transform:translateY(-2px);box-shadow:0 2px 6px rgba(16,20,40,.05),0 20px 44px rgba(18,26,44,.11)!important}
+.libcard:active{transform:scale(.985)}
+.li{color:var(--tint)!important}
+.ln{font-family:var(--sans)!important;font-weight:700!important;color:var(--ink)!important;letter-spacing:-.02em}
+.pill{background:rgba(120,120,128,.10)!important;border-radius:999px!important;color:var(--ink-2)!important}
+.ring{background:conic-gradient(var(--tint) var(--p),rgba(120,120,128,.14) 0)!important;
+  box-shadow:0 10px 26px rgba(27,156,119,.16)}
+.ring::after{background:rgba(255,255,255,.96)!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+.ring b{font-family:var(--sans)!important;font-weight:700!important}
+.strip .cbar{background:rgba(120,120,128,.07)!important;border-radius:7px!important}
+.strip .cbar i{background:linear-gradient(180deg,#4ed0a8,var(--tint))!important;border-radius:7px!important}
+.stack{background:rgba(120,120,128,.12)!important;border-radius:999px!important}
+.errhead b{color:var(--ink)!important}
+.etag{border-radius:999px!important;border:1px solid var(--hairline)!important;background:rgba(255,255,255,.8)!important}
+
+/* 标签颜色 → iOS 系统色系 */
+.tag.t-xijie{color:#0a6ba8!important;border-color:rgba(10,132,255,.3)!important;background:rgba(10,132,255,.10)!important}
+.tag.t-tuili{color:#8a5310!important;border-color:rgba(255,159,10,.32)!important;background:rgba(255,159,10,.12)!important}
+.tag.t-chenghu{color:#a8430f!important;border-color:rgba(255,149,0,.30)!important;background:rgba(255,149,0,.10)!important}
+.tag.t-ciyi{color:#6b3fa0!important;border-color:rgba(175,82,222,.30)!important;background:rgba(175,82,222,.10)!important}
+.tag.t-zhuzhi{color:#126b34!important;border-color:rgba(52,199,89,.32)!important;background:rgba(52,199,89,.12)!important}
+.tag.t-taodu{color:#b0002e!important;border-color:rgba(255,45,85,.28)!important;background:rgba(255,45,85,.10)!important}
+
+/* ---------- 11. 弹层 / 浮窗 ---------- */
+.syncmask,.acctsheet,.lgcover ~ .mask{background:rgba(20,22,26,.34)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(120%);backdrop-filter:blur(18px) saturate(120%)}
+.syncbox,.acctsheet .asbox{
+  border-radius:26px!important;border:1px solid rgba(255,255,255,.8)!important;
+  background:rgba(255,255,255,.88)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(190%);
+  backdrop-filter:blur(34px) saturate(190%);
+  box-shadow:0 2px 10px rgba(16,20,40,.08),0 40px 90px rgba(16,20,40,.26)!important;
+  animation:sheetIn .42s var(--spring) both;
+}
+@keyframes sheetIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+.syncbox h3,.acctsheet .ashead b{font-family:var(--sans)!important;font-weight:700!important;letter-spacing:-.02em}
+.syncsec{border-radius:16px!important;background:rgba(247,247,250,.9)!important;border:1px solid var(--line-2)!important}
+.acctsheet .asstats>div{border-radius:14px!important;background:rgba(247,247,250,.9)!important;border:1px solid var(--line-2)!important}
+.acctchip{
+  border-radius:999px!important;border:1px solid rgba(255,255,255,.8)!important;
+  background:rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(190%);backdrop-filter:blur(24px) saturate(190%);
+  box-shadow:0 6px 20px rgba(18,26,44,.10)!important;color:var(--ink)!important;height:36px!important;
+}
+.acctchip.on{background:linear-gradient(180deg,var(--tint-2),var(--tint))!important;border-color:transparent!important;color:#fff!important}
+.acctmenu{
+  border-radius:18px!important;border:1px solid rgba(255,255,255,.8)!important;
+  background:rgba(255,255,255,.82)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(190%);backdrop-filter:blur(30px) saturate(190%);
+  box-shadow:0 2px 8px rgba(16,20,40,.08),0 24px 60px rgba(16,20,40,.2)!important;
+  animation:popIn .3s var(--spring) both;
+}
+.acctmenu button{border-radius:12px!important}
+.acctmenu button:hover{background:rgba(27,156,119,.10)!important}
+
+/* Toast：灵动岛式胶囊 */
+.toast{
+  border-radius:999px!important;background:rgba(28,30,34,.78)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+  color:#fff!important;font-size:13px!important;padding:11px 20px!important;
+  box-shadow:0 12px 40px rgba(10,12,20,.28),inset 0 1px 0 rgba(255,255,255,.14)!important;
+  transition:opacity .28s var(--spring),transform .34s var(--spring)!important;
+}
+.toast.on{transform:translateX(-50%) translateY(0) scale(1)!important}
+
+/* 图表大图 */
+.lightbox{background:rgba(12,14,18,.62)!important;
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
+.lightbox img{border-radius:20px!important;box-shadow:0 40px 90px rgba(0,0,0,.45)!important;animation:popIn .35s var(--spring) both}
+
+/* ---------- 12. 移动端 ---------- */
+@media (max-width:980px){
+  body{background-attachment:scroll!important}
+  .mobilebar{
+    background:rgba(248,248,252,.78)!important;border-bottom:1px solid rgba(255,255,255,.9)!important;
+    -webkit-backdrop-filter:blur(26px) saturate(190%);backdrop-filter:blur(26px) saturate(190%);
+    box-shadow:0 6px 20px rgba(18,26,44,.07);padding:10px 16px!important;
+    padding-top:calc(10px + env(safe-area-inset-top))!important;
+  }
+  .mobilebar .mb{border-radius:999px!important;border:1px solid var(--hairline)!important;
+    background:rgba(255,255,255,.72)!important;padding:8px 13px!important;font-size:13px!important}
+  .mobilebar .mt{font-family:var(--sans)!important;font-size:15px!important;font-weight:650!important}
+  .side{
+    position:fixed!important;left:8px!important;top:8px!important;bottom:8px!important;
+    margin:0!important;height:auto!important;width:min(300px,86vw)!important;flex:none!important;
+    border-radius:24px!important;
+    transform:translateX(-112%)!important;
+    transition:transform .42s var(--spring)!important;
+    box-shadow:0 30px 70px rgba(12,18,30,.28)!important;
+  }
+  .side.open{transform:translateX(0)!important}
+  #scrim{background:rgba(16,20,28,.28)!important;
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .wrap{padding:18px 16px 90px!important}
+  .kpis{gap:10px!important}
+  .kpi{border-radius:18px!important;padding:13px 14px!important}
+  .kpi b{font-size:24px!important}
+  h2.page{font-size:30px!important}
+  .toolbar{top:calc(8px + env(safe-area-inset-top))!important;border-radius:14px!important}
+  .flashcard .fw{font-size:30px!important}
+  .toast{bottom:calc(22px + env(safe-area-inset-bottom))!important}
+}
+
+/* ---------- 13. 动态细节：入场、按压、悬停 ---------- */
+@keyframes iosRise{from{opacity:0;transform:translateY(12px) scale(.992)}to{opacity:1;transform:none}}
+.pagehead{animation:iosRise .5s var(--spring) both}
+.card,.kpi,.step,.libcard,.wcard,.vitem,.chartcard,.lexbig{animation:iosRise .52s var(--spring) both}
+.kpi:nth-child(1){animation-delay:.02s}
+.kpi:nth-child(2){animation-delay:.05s}
+.kpi:nth-child(3){animation-delay:.08s}
+.kpi:nth-child(4){animation-delay:.11s}
+.card:nth-child(2){animation-delay:.04s}
+.card:nth-child(3){animation-delay:.07s}
+.card:nth-child(4){animation-delay:.10s}
+.step:nth-child(2){animation-delay:.03s}
+.step:nth-child(3){animation-delay:.06s}
+.step:nth-child(4){animation-delay:.09s}
+
+/* 卡片悬停微抬（桌面） */
+@media (hover:hover) and (min-width:981px){
+  .card:hover,.chartcard:hover,.lexbig:hover{box-shadow:0 2px 6px rgba(16,20,40,.05),0 22px 52px rgba(18,26,44,.10),inset 0 1px 0 #fff!important}
+}
+
+/* 进度类过渡 */
+[class*="bar"] i{transition:width .5s var(--spring),height .5s var(--spring)}
+.bar .t{transition:width .6s var(--spring)}
+
+/* 尊重「减少动态效果」 */
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.001s!important}
+  body::before{animation:none}
+}
+
+/* ---------- 14. 登录页：iOS 大标题 + 玻璃面板 ---------- */
+body.auth-mode{
+  background:var(--paper)!important;
+  background-image:
+    radial-gradient(760px 640px at 92% 2%, rgba(190,238,223,.9), transparent 62%),
+    radial-gradient(700px 600px at 2% 98%, rgba(255,220,214,.80), transparent 64%),
+    radial-gradient(900px 720px at 58% 64%, rgba(224,218,252,.78), transparent 66%),
+    linear-gradient(180deg,#f8f8fc,#f1f1f6)!important;
+}
+.lgcover{max-width:1080px!important;padding:clamp(30px,5vh,64px) clamp(20px,3vw,44px)!important;gap:clamp(24px,4vw,56px)!important;color:var(--ink)!important}
+.lgcover .lgbrand h1{
+  font-family:var(--sans)!important;font-weight:700!important;letter-spacing:-.03em!important;
+  font-size:clamp(36px,4.6vw,58px)!important;line-height:1.06!important;color:var(--ink)!important;
+  -webkit-text-fill-color:var(--ink)!important;background:none!important;
+}
+.lgcover .lgline{font-family:var(--sans)!important;font-size:15px!important;line-height:1.75!important;color:var(--ink-3)!important}
+.lgcover .lgmark{
+  border-radius:999px!important;border:1px solid rgba(255,255,255,.9)!important;
+  background:rgba(255,255,255,.7)!important;
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  color:var(--tint)!important;box-shadow:0 8px 24px rgba(18,26,44,.08)!important;backdrop-filter:blur(18px)}
+.lgcover .lgkick{color:var(--ink-3)!important;letter-spacing:.28em!important}
+.lgcover .lgart{opacity:.42!important}
+.lgcover .lgpanel{
+  border-radius:28px!important;border:1px solid rgba(255,255,255,.85)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.78))!important;
+  -webkit-backdrop-filter:blur(30px) saturate(190%);
+  backdrop-filter:blur(30px) saturate(190%);
+  box-shadow:0 2px 8px rgba(16,20,40,.05),0 34px 80px rgba(16,20,40,.16),inset 0 1px 0 #fff!important;
+  padding:clamp(24px,2.6vw,34px)!important;
+  animation:iosRise .55s var(--spring) both;
+}
+.lgcover .lgpanel:before{
+  content:"";display:block;width:38px;height:5px;border-radius:99px;
+  background:rgba(120,120,128,.22);margin:-6px auto 16px;
+}
+.lgcover .lgtabs{
+  background:rgba(120,120,128,.12)!important;border-radius:12px!important;padding:3px!important;
+  border:0!important;margin-bottom:22px!important;
+}
+.lgcover .lgtabs button{color:var(--ink-2)!important;font-size:13.5px!important;border-radius:9px!important;padding:9px 0!important}
+.lgcover .lgtabs button.on{background:#fff!important;color:var(--ink)!important;
+  box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.04)!important}
+.lgcover .lgfield span{color:var(--ink-3)!important;font-size:11.5px!important;letter-spacing:.06em!important}
+.lgcover input{height:48px!important;border-radius:14px!important;background:rgba(247,247,250,.94)!important;
+  border:1px solid var(--hairline)!important;color:var(--ink)!important;font-size:15px!important}
+.lgcover input:focus{background:#fff!important;border-color:var(--tint-line)!important;
+  box-shadow:0 0 0 3.5px rgba(27,156,119,.16)!important}
+.lgcover .btn{
+  height:48px!important;border-radius:999px!important;font-size:15px!important;font-weight:600!important;
+  background:linear-gradient(180deg,var(--tint-2),var(--tint))!important;color:#fff!important;
+  box-shadow:0 12px 28px rgba(27,156,119,.32)!important;border:0!important;
+  transition:transform .26s var(--spring),box-shadow .26s!important;
+}
+.lgcover .btn:hover{transform:translateY(-1px)!important;background:linear-gradient(180deg,#16c497,var(--tint))!important;
+  box-shadow:0 16px 34px rgba(27,156,119,.38)!important}
+.lgcover .btn:active{transform:scale(.97)!important}
+.lgcover .btn.ghost{background:rgba(120,120,128,.10)!important;color:var(--ink-2)!important;box-shadow:none!important}
+.lgcover .lgstats>div{border-radius:16px!important;background:rgba(247,247,250,.9)!important;border:1px solid var(--line-2)!important}
+.lgcover .lgmsg{color:var(--bad)!important}
+.lgback{border-radius:999px!important;border:1px solid rgba(255,255,255,.85)!important;
+  background:rgba(255,255,255,.7)!important;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  color:var(--ink)!important;box-shadow:0 6px 18px rgba(18,26,44,.08)!important}
+.lgback:hover{background:var(--tint)!important;color:#fff!important;border-color:transparent!important}
+
+/* ---------- 15. 今日复习 / 遗忘曲线 / 快捷键 ---------- */
+.todaycard{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:20px 24px;margin:22px 0 20px;border-radius:var(--radius);
+  background:linear-gradient(135deg,rgba(27,156,119,.14),rgba(255,255,255,.82) 62%);
+  border:1px solid rgba(27,156,119,.20);
+  box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
+  animation:iosRise .5s var(--spring) both;
+}
+.tclb{font-size:12px;letter-spacing:.10em;color:var(--tint);font-weight:600}
+.tcln{font-size:30px;line-height:1.15;margin-top:6px;font-weight:600;color:var(--ink);letter-spacing:-.02em}
+.tcln span{font-size:14px;font-weight:500;color:var(--ink-3);margin-left:2px}
+.tclm{font-size:12.5px;color:var(--ink-3);margin-top:6px;line-height:1.5}
+.todaycard .btn{flex:0 0 auto}
+.todaycard .btn[disabled]{opacity:.55}
+@media (max-width:640px){
+  .todaycard{flex-direction:column;align-items:flex-start;gap:14px}
+  .todaycard .btn{width:100%}
+}
+.rvchip.today{background:var(--tint);color:#fff;border-color:transparent}
+.flashcard{position:relative}
+.fdue{
+  display:inline-flex;align-items:center;margin:10px auto 0;padding:4px 11px;border-radius:999px;
+  font-size:11.5px;color:var(--ink-3);background:rgba(118,118,128,.10);
+  border:1px solid rgba(0,0,0,.04);letter-spacing:.02em;width:auto;
+}
+.fdue.now{color:#fff;background:var(--tint);border-color:transparent}
+.lx-due{
+  font-size:11px;color:var(--ink-3);padding:2px 8px;border-radius:999px;
+  background:rgba(0,0,0,.04);white-space:nowrap;
+}
+.lx-due.now{color:var(--tint);background:rgba(27,156,119,.14);font-weight:600}
+.kbdhint{
+  font-size:11.5px;color:var(--ink-3);letter-spacing:.02em;white-space:nowrap;
+  padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.6);
+  border:1px solid rgba(0,0,0,.05);
+}
+@media (max-width:900px){.kbdhint{display:none}.kbonly{display:none}}
+.q.kbcur{box-shadow:0 0 0 2px rgba(27,156,119,.35),var(--shadow-sm);border-radius:16px;transition:box-shadow .2s var(--spring)}
+
+/* 打印时不要动画、不要玻璃 */
+@media print{
+  .card,.kpi{animation:none!important;box-shadow:none!important;background:#fff!important}
+}
+
+</style>
 </head>
 <body>
 <div class="app">
@@ -2241,6 +2977,7 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     gist: 'e2.gist',
     err: 'e2.errtype',
     try2: 'e2.try2',
+    srs: 'e2.srs',
     last: 'e2.last'
   };
   let lastSaved = null;
@@ -2272,6 +3009,60 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     ['l', '定位', '#2b5f95'],
     ['o', '选项理解', '#9c5a8e']
   ];
+
+  /* ---------- 遗忘曲线排程 ---------- */
+  let flashKeysOff = null;
+  let pendingToday = false;
+  const DAY = 86400000;
+  const SRS_STEPS = [1, 3, 7, 15, 30];   // 天
+  let srsMap = store.get(K.srs, {}) || {};
+  function srsKey(w) { return String(w || '').toLowerCase(); }
+  function srsOf(w) { return srsMap[srsKey(w)] || null; }
+  function srsGrade(w, ok) {
+    const k = srsKey(w); if (!k) return;
+    const e = srsMap[k] || { step: 0, reps: 0, lapses: 0, ivl: 0 };
+    const now = Date.now();
+    if (ok) {
+      e.step = Math.min((e.step || 0) + 1, SRS_STEPS.length - 1);
+      e.reps = (e.reps || 0) + 1;
+      e.ivl = SRS_STEPS[e.step];
+    } else {
+      e.step = 0;
+      e.lapses = (e.lapses || 0) + 1;
+      e.ivl = 1;
+    }
+    e.last = now;
+    e.due = now + e.ivl * DAY;
+    srsMap[k] = e;
+    store.set(K.srs, srsMap);
+  }
+  /* 到期：学过且到期，或从没复习过的词 */
+  function srsIsDue(w) {
+    const e = srsMap[srsKey(w)];
+    return !e || e.due <= Date.now();
+  }
+  function srsDueList(list) { return (list || []).filter(x => srsIsDue(x.w)); }
+  function srsStats() {
+    const now = Date.now();
+    const keys = Object.keys(srsMap);
+    let due = 0, today = 0, learned = 0;
+    keys.forEach(k => {
+      const e = srsMap[k];
+      if (!e) return;
+      learned++;
+      if (e.due <= now) due++;
+      else if (e.due - now < DAY) today++;
+    });
+    return { due, today, learned };
+  }
+  function srsLabel(w) {
+    const e = srsOf(w);
+    if (!e) return '未复习';
+    const now = Date.now();
+    if (e.due <= now) return '今天到期';
+    const d = Math.ceil((e.due - now) / DAY);
+    return d <= 1 ? '明天到期' : d + ' 天后';
+  }
 
   /* ---------- 小工具 ---------- */
   const $ = (s, el) => (el || document).querySelector(s);
@@ -2320,6 +3111,53 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     route.view = h[0] || 'home';
     route.year = h[1] || null;
     render();
+  });
+
+  /* ---------- 阅读页键盘快捷键（A–D 选项 · ← → 上下题） ---------- */
+  function qAtCenter() {
+    const qs = $$('.q[data-qno]');
+    if (!qs.length) return { qs, i: -1 };
+    const mid = window.innerHeight * 0.42;
+    let best = -1, dist = 1e9;
+    qs.forEach((q, i) => {
+      const r = q.getBoundingClientRect();
+      const center = r.top + Math.min(r.height, 360) / 2;
+      const d = Math.abs(center - mid);
+      if (d < dist) { dist = d; best = i; }
+    });
+    return { qs, i: best };
+  }
+  function markCur(q) {
+    $$('.q.kbcur').forEach(x => x.classList.remove('kbcur'));
+    if (q) q.classList.add('kbcur');
+  }
+  document.addEventListener('keydown', e => {
+    if (route.view !== 'paper') return;
+    const t = e.target;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) return;
+    if (document.querySelector('.syncmask, .pop, .drawer.open')) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+    if (k.length === 1 && 'ABCD'.includes(k)) {
+      const { qs, i } = qAtCenter();
+      if (i < 0) return;
+      const opt = $$('.opt', qs[i]).find(b => b.dataset.l === k);
+      if (!opt) return;
+      e.preventDefault();
+      opt.click();
+      markCur(qs[i]);
+      return;
+    }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      const { qs, i } = qAtCenter();
+      if (i < 0) return;
+      const n = i + (e.key === 'ArrowRight' ? 1 : -1);
+      if (n < 0 || n >= qs.length) return;
+      e.preventDefault();
+      qs[n].scrollIntoView({ block: 'center', behavior: 'smooth' });
+      markCur(qs[n]);
+    }
   });
 
   /* ---------- 进度统计 ---------- */
@@ -3092,6 +3930,7 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     gists = store.get(K.gist, {});
     errs = store.get(K.err, {});
     try2 = store.get(K.try2, {});
+    srsMap = store.get(K.srs, {}) || {};
     settings = Object.assign({ annMode: false, showNote: false, showAnswer: false, retry: false, size: 19 }, store.get(K.set, {}));
     timer = store.get(K.timer, null);
     paintSaved();
@@ -3388,6 +4227,7 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     if (menuEl) menuEl.classList.remove('on');
     qnotes = store.get(K.qnote, {});
     closePop();
+    if (flashKeysOff) { document.removeEventListener('keydown', flashKeysOff); flashKeysOff = null; }
     const bar = $('#annbar');
     if (bar) bar.style.display = 'none';
     closeDrawer();
@@ -3447,6 +4287,9 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     const vocabN = Object.keys(vocab).length;
     const totalQ = REAL.length * 45;
     const pct = (n, d) => (d && typeof d === 'number' ? Math.round(Math.min(n, d) / d * 100) : 0);
+    const sS = srsStats();
+    const allW = Object.values(vocab).map(v => ({ w: v.w }));
+    const dueN = srsDueList(allW).length;
     const last = store.get(K.last, null);
     const lastP = last && paperOf(last) ? paperOf(last) : REAL[REAL.length - 1];
     const topErr = eTotal ? ERRTYPES.slice().sort((a, b) => eS[b[0]] - eS[a[0]])[0] : null;
@@ -3467,6 +4310,15 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
           <div class="ring" style="--p:${o.rate}%"><span><b>${o.done ? o.rate + '%' : '—'}</b><i>正确率</i></span></div>
           <div class="ringmeta">已答 ${o.done} / ${totalQ} 题<br/>生词 ${vocabN} · 笔记 ${notesN}</div>
         </div>
+      </div>
+
+      <div class="todaycard">
+        <div class="tcl">
+          <div class="tclb">今日复习 · 遗忘曲线</div>
+          <div class="tcln">${dueN}<span> 个词到期</span></div>
+          <div class="tclm">${sS.learned ? `已排程 ${sS.learned} 词 · 明天还有 ${sS.today} 个` : '还没开始排程：先复习一轮，之后会按 1 / 3 / 7 / 15 / 30 天自动安排'}</div>
+        </div>
+        <button class="btn on" id="startToday" ${dueN ? '' : 'disabled'}>${dueN ? '开始复习 →' : '今天已完成'}</button>
       </div>
 
       <div class="flow">
@@ -3524,6 +4376,8 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
       const [view, year] = b.dataset.go.split('/');
       go(view, year);
     });
+    const st = $('#startToday', v);
+    if (st && dueN) st.onclick = () => { pendingToday = true; go('mine'); };
   }
 
   /* ---------------- 逐句精翻 ---------------- */
@@ -3690,6 +4544,7 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
       <span class="pill" id="retryChip" style="display:none"></span>
       <button class="btn" id="btnSize">Aa</button>
       <button class="btn danger" id="btnReset">清空</button>
+      <span class="kbdhint">键盘：A–D 选答 · ← → 上下题</span>
       <span class="sp"></span>
       <button class="btn" id="btnPrev">${ICON.left}上一套</button>
       <button class="btn" id="btnNext">下一套${ICON.arrow}</button>
@@ -4139,12 +4994,14 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     return t || '—';
   }
 
-  function flash(list) {
+  function flash(list, opt) {
     if (!list.length) return toast('生词本是空的');
+    const today = opt && opt.today;
     let i = 0, good = 0, bad = 0;
     const order = list.map((_, k) => k).sort(() => Math.random() - .5);
     const v = viewEl();
     let flipped = false;
+    if (flashKeysOff) { document.removeEventListener('keydown', flashKeysOff); flashKeysOff = null; }
     const draw = () => {
       const w = list[order[i % list.length]];
       const d = lookup(w.w);
@@ -4152,21 +5009,24 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
       const cn = String(d.t || w.t || '').split('\n').map(s => s.trim()).filter(Boolean).slice(0, 4);
       const col = (((window.COL && COL[w.w.toLowerCase()]) || d.col || [])).slice(0, 4);
       const ex = (d.ex || [])[0], exzh = (d.exzh || [])[0] || '';
+      const dueTxt = srsLabel(w.w);
       flipped = false;
       v.innerHTML = `
         <div class="pagehead">
-          <div class="eyebrow">FLASHCARD · ${i % list.length + 1} / ${list.length}</div>
-          <h2 class="page">闪卡</h2>
+          <div class="eyebrow">${today ? 'TODAY · ' : 'FLASHCARD · '}${i % list.length + 1} / ${list.length}</div>
+          <h2 class="page">${today ? '今日复习' : '闪卡'}</h2>
+          <p class="sub">按遗忘曲线排程：答对推后 1 → 3 → 7 → 15 → 30 天，答错回到 1 天。</p>
         </div>
         <div class="flashwrap">
           <div class="flashcard" id="fc">
             ${wordArtHTML(w.w)}
             <div class="fw">${esc(w.w)}</div>
             <div class="fph">${p ? `<span class="ipa">/${esc(p)}/</span>` : ''}${pu ? `<span class="ipa us">美 /${esc(pu)}/</span>` : ''}</div>
+            <div class="fdue ${srsIsDue(w.w) ? 'now' : ''}">${esc(dueTxt)}</div>
             <div class="fsay">
               <button class="btn xs ghost" data-pk="en-GB">${ICON.sound} 英音</button>
               <button class="btn xs ghost" data-pk="en-US">${ICON.sound} 美音</button>
-              <span class="fineprint">点卡片翻面</span>
+              <span class="fineprint">点卡片翻面<span class="kbonly"> · 空格翻面 · ← → 判分</span></span>
             </div>
             <div class="fback" id="fb">
               <div class="fcn">${cn.length ? cn.map(x => `<div>${esc(x)}</div>`).join('') : esc(w.t || '—')}</div>
@@ -4180,6 +5040,7 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
             <button class="btn ghost" id="fn2">还要再看</button>
             <button class="btn ghost" id="fq">退出</button>
           </div>
+          <p class="fineprint">手机可左右轻扫：向左＝记住了，向右＝还要再看。</p>
         </div>`;
       const card = $('#fc');
       const open = () => {
@@ -4188,12 +5049,38 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
         card.classList.add('flipped');
         pronounce(w.w, 'en-GB');
       };
+      const grade = ok => {
+        srsGrade(w.w, ok);
+        if (ok) good++; else bad++;
+        i++; draw();
+      };
       card.onclick = e => { if (!e.target.closest('[data-pk]')) open(); };
       $$('[data-pk]', v).forEach(b => b.onclick = ev => { ev.stopPropagation(); pronounce(w.w, b.dataset.pk); });
-      $('#fg').onclick = () => { good++; i++; draw(); };
-      $('#fn2').onclick = () => { bad++; i++; draw(); };
-      $('#fq').onclick = () => render();
-      setTimeout(() => { }, 0);
+      $('#fg').onclick = () => grade(true);
+      $('#fn2').onclick = () => grade(false);
+      $('#fq').onclick = () => { if (flashKeysOff) { document.removeEventListener('keydown', flashKeysOff); flashKeysOff = null; } render(); };
+
+      /* 键盘：空格翻面，→ 记住，← 再看，Esc 退出 */
+      flashKeysOff = e => {
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || $('.syncmask') || $('.pop')) return;
+        if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowUp') { e.preventDefault(); open(); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); grade(true); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); grade(false); }
+        else if (e.key === 'Escape') { $('#fq').click(); }
+      };
+      document.addEventListener('keydown', flashKeysOff);
+
+      /* 触屏：左右轻扫判分 */
+      let sx = 0, sy = 0, tracking = false;
+      card.addEventListener('touchstart', e => {
+        const t = e.touches[0]; sx = t.clientX; sy = t.clientY; tracking = true;
+      }, { passive: true });
+      card.addEventListener('touchend', e => {
+        if (!tracking) return; tracking = false;
+        const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+        if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+        if (dx < 0) grade(true); else grade(false);
+      }, { passive: true });
     };
     draw();
   }
@@ -4265,6 +5152,7 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
         ${d.p ? `<span class="ipa">/${esc(d.p)}/</span>` : ''}
         ${d.lv ? `<span class="lvl">${LVNAME[d.lv] || ''}</span>` : ''}
         ${badges}
+        <span class="lx-due${srsIsDue(row.w) ? ' now' : ''}">${esc(srsLabel(row.w))}</span>
         <span class="lx-cn1">${esc(cn[0] || '')}</span>
         <span class="lx-arr">▾</span>
       </button>
@@ -4317,6 +5205,7 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
         <div class="reviewrow">
           <span class="rvlabel">复习</span>
           <button class="rvchip on" data-rv="flash">闪卡</button>
+          ${(() => { const n = srsStats().due; return n ? `<button class="rvchip today" data-rv="today">今日到期 ${n}</button>` : ''; })()}
           <button class="rvchip" data-rv="match">配对</button>
           <button class="rvchip" data-rv="listen">听音</button>
           <button class="rvchip" data-rv="cloze">例句填空</button>
@@ -4394,14 +5283,30 @@ window.WPHOTO={"beach":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
     const vx = $('#lxExport', v); if (vx) vx.onclick = () => exportVocabPDF(rows);
     $$('[data-rv]', v).forEach(b => b.onclick = () => {
       $$('[data-rv]', v).forEach(x => x.classList.toggle('on', x === b));
+      if (flashKeysOff) { document.removeEventListener('keydown', flashKeysOff); flashKeysOff = null; }
       const k = b.dataset.rv;
       if (k === 'flash') flash(pv);
+      else if (k === 'today') {
+        const due = srsDueList(pv);
+        if (!due.length) return toast('今天没有到期的词，明天再来');
+        flash(due, { today: true });
+      }
       else if (k === 'match') matchGame(pv);
       else if (k === 'listen') listenGame(pv);
       else if (k === 'cloze') clozeGame(pv);
       else if (k === 'spell') spellGame(pv);
       else if (k === 'quiz') quizGame(pv);
     });
+
+    if (pendingToday) {
+      pendingToday = false;
+      const due = srsDueList(pv);
+      if (due.length) setTimeout(() => {
+        $$('[data-rv]', v).forEach(x => x.classList.toggle('on', x.dataset.rv === 'today'));
+        flash(due, { today: true });
+      }, 0);
+      else toast('今天没有到期的词');
+    }
   }
 
   /* ---------- 练习：拼写 ---------- */
